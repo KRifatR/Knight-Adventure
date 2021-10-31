@@ -19,4 +19,14 @@ public class GameOver : MonoBehaviour
     {
         SceneManager.LoadScene(0);
     }
+    public void Deal()
+    {
+        SceneManager.LoadScene(8);
+
+        PlayerData.CoinCount = 0;
+        PlayerData.HealthPoint = PlayerData.MaxHealth;
+        PlayerData.LiveCount = 3;
+        PlayerData.MixturesCount = 3;
+        PlayerData.Score = 0;
+    }
 }

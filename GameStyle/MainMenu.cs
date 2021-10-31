@@ -37,9 +37,9 @@ public class MainMenu : MonoBehaviour
         PlayerData.MaxHealth = 100;
         PlayerData.HealthPoint = 100;
         PlayerData.LiveCount = 3;
-        PlayerData.MinDmg = 15;
+        PlayerData.MinDmg = 20;
         PlayerData.MaxDmg = 25;
-        PlayerData.AttakSpeed = 7;
+        PlayerData.AttakSpeed = 10;
         PlayerData.AttakInSecond = PlayerData.AttakSpeed / 2f;
         PlayerData.MixturesCount = 3;
         PlayerData.Score = 0;

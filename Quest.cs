@@ -73,9 +73,10 @@ public class Quest : MonoBehaviour
             PlayerData.Quest_1 = 2;
 
             PlayerData.PlayerSkin = 1;
-            PlayerData.WeaponUpLvl ++;
+            PlayerData.WeaponUpLvl += 1;
             PlayerData.MaxHealth += 20;
             PlayerData.HealthPoint = PlayerData.MaxHealth;
+            PlayerData.CoinCount += 500;
 
             if(PlayerData.WeaponType == 0)
             {

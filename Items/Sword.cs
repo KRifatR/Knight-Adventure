@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Sword : MonoBehaviour
 {
+
+    [SerializeField] private int _weaponType;
     [SerializeField] private float _minDmg;
     [SerializeField] private float _maxDmg;
     [SerializeField] private float _attackSpeed;
@@ -14,7 +16,7 @@ public class Sword : MonoBehaviour
     {
         if (collision.tag.Equals("Player"))
         {
-            PlayerData.WeaponType = 2;
+            PlayerData.WeaponType = _weaponType;
             if (PlayerData.MinDmg < _minDmg)
             {
                 PlayerData.MinDmg = _minDmg + PlayerData.WeaponUpLvl * PlayerData.DmgUp;

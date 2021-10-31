@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Mixture : MonoBehaviour
 {
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.tag.Equals("Player"))
+        if (collision.tag.Equals("Player") || collision.tag.Equals("WallColl"))
         {
             PlayerData.MixturesCount++;
             Destroy(gameObject);

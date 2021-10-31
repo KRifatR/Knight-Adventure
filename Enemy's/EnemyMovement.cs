@@ -10,6 +10,7 @@ public class EnemyMovement : MonoBehaviour
     [SerializeField] private float _score;
     [SerializeField] private int _minDmg;
     [SerializeField] private int _maxDmg;
+    [SerializeField] private float _attackCoolDown;
     [SerializeField] private int _dropSum;
     [SerializeField] private GameObject _enemy;
 
@@ -17,8 +18,6 @@ public class EnemyMovement : MonoBehaviour
     private Vector2 _agroZonePos;
     [SerializeField] private GameObject _notFollowZone;
 
-    private bool _dmgColl;
-    private bool _dmg;
     private bool _dmgForPlayer;
     [HideInInspector] public float _HP;
 
@@ -34,11 +33,14 @@ public class EnemyMovement : MonoBehaviour
     private Vector2 _itemPos;
     private Vector2 _startPos;
     private GameObject _greenZone;
+
+    private float _lateAttack;
+    private float _lateDmg;
     private void Start()
     {
-        _maxHP = _maxHP * (0.5f + 0.7f * Dungeon.DungeonLvl);
-        _minDmg = _minDmg * Dungeon.DungeonLvl;
-        _maxDmg = _maxDmg * Dungeon.DungeonLvl;
+        _maxHP = _maxHP * (0.5f + 0.7f * Dungeon.DungeonLvl) + PlayerData.WeaponUpLvl * 20;
+        _minDmg += _minDmg * Dungeon.DungeonLvl / 4;
+        _maxDmg += _maxDmg * Dungeon.DungeonLvl / 4;
         _agroZonePos = _agroZone.transform.position;
         _HP = _maxHP;
         _player = GameObject.FindGameObjectWithTag("Player");
@@ -51,6 +53,7 @@ public class EnemyMovement : MonoBehaviour
         _agent.updateRotation = false;
         _agent.updateUpAxis = false;
         _greenZone = GameObject.FindGameObjectWithTag("GreenZone");
+        _lateDmg = 0;
     }
 
     private void Update()
@@ -63,7 +66,8 @@ public class EnemyMovement : MonoBehaviour
         {
             StartCoroutine(AgroEnemy());
         }
-        else if(_greenZone.GetComponent<Collider2D>().IsTouching(_playerColl) || !_greenZone.GetComponent<Collider2D>().IsTouching(_playerColl))
+
+        else if(_greenZone.GetComponent<Collider2D>().IsTouching(_playerColl) || _notFollowZone.GetComponent<Collider2D>().IsTouching(_playerColl))
         {
             StopCoroutine(AgroEnemy());
             StartCoroutine(GoEnemyStartPos());
@@ -78,28 +82,18 @@ public class EnemyMovement : MonoBehaviour
             {
                 _itemPos = new Vector2(transform.position.x + Random.Range(-1, 1), transform.position.y + Random.Range(-1, 1));
                 Instantiate(_drop[Random.Range(0, _drop.Length)], _itemPos, Quaternion.identity);
-                PlayerData.Score += _score;
+                PlayerData.Score += _score * Dungeon.DungeonLvl;
             }
         }
-
-       if (Input.GetKeyUp(KeyCode.Space))
-       {
-            _dmg = false;
-       }
-       else if (Input.GetKeyDown(KeyCode.Space))
-       {
-            _dmg = true;
-       }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.tag.Equals("PlayerWeapon"))
         {
-            StartCoroutine(Dmg());
+            _lateAttack = Time.time - _attackCoolDown / 1.1f;
             StartCoroutine(DMGforPlayer());
             _dmgForPlayer = true;
-            _dmgColl = true;
         }
 
         if (collision.tag.Equals("Player"))
@@ -110,18 +104,25 @@ public class EnemyMovement : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.tag.Equals("PlayerWeapon") && Input.GetKeyDown(KeyCode.Space))
+        if (collision.tag.Equals("PlayerWeapon"))
         {
-            _HP -= Random.Range((PlayerData.MinDmg), (PlayerData.MaxDmg));
+            float _deltaTime = Time.time - _lateDmg;
+            if(_deltaTime > (1 / PlayerData.AttakInSecond) && Input.GetKey(KeyCode.Space))
+            {
+                _HP -= Random.Range((PlayerData.MinDmg + PlayerData.DmgUp * PlayerData.WeaponUpLvl), (PlayerData.MaxDmg + PlayerData.DmgUp * PlayerData.WeaponUpLvl));
+                _lateDmg = Time.time;
+            }
+            else
+            {
+                _HP -= 0;
+            }
         }
     }
     private void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.tag.Equals("PlayerWeapon"))
         {
-            StopCoroutine(Dmg());
             _dmgForPlayer = false;
-            _dmgColl = false;
         }
 
         if (collision.tag.Equals("Player"))
@@ -132,40 +133,24 @@ public class EnemyMovement : MonoBehaviour
         }
     }
 
-    IEnumerator Dmg()
-    {
-        for ( int i = 0; i < 255; i++)
-        {
-            if (_dmg == true && _dmgColl == true)
-            {
-                _HP -= Random.Range((PlayerData.MinDmg + PlayerData.DmgUp * PlayerData.WeaponUpLvl), (PlayerData.MaxDmg + PlayerData.DmgUp * PlayerData.WeaponUpLvl));
-            
-            }
-            else
-            {
-                _HP -= 0;
-                
-            }
-            yield return new WaitForSeconds(1 / PlayerData.AttakInSecond);
-        }
-    }
     IEnumerator DMGforPlayer()
     {
         for (int i = 0; i < 255; i++)
         {
-            if(_dmgForPlayer == true)
+            float _deltaTime = Time.time - _lateAttack;
+            if (_dmgForPlayer == true && _deltaTime > _attackCoolDown)
             {
                 PlayerData.HealthPoint -= Random.Range((_minDmg), (_maxDmg));
+                _lateAttack = Time.time;
             }
-            else if(_dmgForPlayer == false)
+            else
             {
                 PlayerData.HealthPoint -= 0;
             }
-           
             yield return new WaitForSeconds(1);
         }
     }
-   
+
     public IEnumerator AgroEnemy()
     {
         if (_agroZone.GetComponent<Collider2D>().IsTouching(_playerColl) && _follow == true)

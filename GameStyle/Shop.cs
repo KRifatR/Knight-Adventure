@@ -20,19 +20,36 @@ public class Shop : MonoBehaviour
 
     private void Update()
     {
-        
         PlayerData.DmgUp = _dmgUp;
         _weaponUpText.GetComponent<Text>().text = _weaponUpScore + "";
         _healthPointUpText.GetComponent<Text>().text = _healthPointUpScore + "";
         _mextureAddText.GetComponent<Text>().text = _mextureAddScore + "";
         _liveAddText.GetComponent<Text>().text = _liveAddScore + "";
+
     }
     public void WeaponUp()
     {
         if (PlayerData.CoinCount >= _weaponUpScore)
         {
             PlayerData.CoinCount -= _weaponUpScore;
-            PlayerData.WeaponUpLvl += 1f;
+            PlayerData.WeaponUpLvl += 1;
+        }
+
+        if (PlayerData.WeaponUpLvl == 3)
+        {
+            PlayerData.WeaponType = 3;
+        }
+        else if (PlayerData.WeaponUpLvl == 5)
+        {
+            PlayerData.WeaponType = 4;
+        }
+        else if (PlayerData.WeaponUpLvl == 7)
+        {
+            PlayerData.WeaponType = 5;
+        }
+        else if (PlayerData.WeaponUpLvl >= 10)
+        {
+            PlayerData.WeaponType = 6;
         }
     }
 

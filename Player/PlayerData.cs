@@ -8,15 +8,15 @@ public class PlayerData : MonoBehaviour
     public static float MaxHealth = 100;
     public static float HealthPoint = 100;
     public static float LiveCount = 3;
-    public static float MinDmg = 15;
+    public static float MinDmg = 20;
     public static float MaxDmg = 25;
-    public static float AttakSpeed = 7;
+    public static float AttakSpeed = 10;
     public static float AttakInSecond = AttakSpeed / 2f;
     public static float MixturesCount = 3;
     public static float Score = 0;
 
     public static float WeaponUpLvl = 0;
-    public static float DmgUp;
+    public static float DmgUp = 5;
 
     public static int PlayerSkin = 0;
     public static int WeaponType = 0;
@@ -40,12 +40,5 @@ public class PlayerData : MonoBehaviour
             LiveCount = 3;
         }
 
-        if (Quest_1 == 1)
-        {
-            MaxHealth += 50;
-
-            MinDmg += 5;
-            MaxDmg += 10;
-        }
     }
 }
